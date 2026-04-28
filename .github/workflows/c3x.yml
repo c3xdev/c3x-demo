@@ -10,4 +10,4 @@ jobs:
       - uses: c3xdev/setup-c3x@v1
         id: c3x
       - run: c3x estimate --path . --format json --out-file c3x.json
-      - run: c3x comment github --path . --github-token ${{ steps.c3x.outputs.token }} --repo ${{ github.repository }} --pull-request ${{ github.event.pull_request.number }}
+      - run: c3x comment github --path c3x.json --github-token ${{ steps.c3x.outputs.token }} --repo ${{ github.repository }} --pull-request ${{ github.event.pull_request.number }}
