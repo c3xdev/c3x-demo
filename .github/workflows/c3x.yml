@@ -2,6 +2,7 @@ name: Cost Estimation
 on: [pull_request]
 permissions:
   pull-requests: write
+  contents: read
 jobs:
   c3x:
     runs-on: ubuntu-latest
@@ -9,5 +10,16 @@ jobs:
       - uses: actions/checkout@v4
       - uses: c3xdev/setup-c3x@v1
         id: c3x
+
+      # Estimate current branch
       - run: c3x estimate --path . --format json --out-file c3x.json
-      - run: c3x comment github --path c3x.json --github-token ${{ steps.c3x.outputs.token }} --repo ${{ github.repository }} --pull-request ${{ github.event.pull_request.number }} --show-all-projects
+
+      # Estimate base branch
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          path: base
+      - run: c3x estimate --path base --format json --out-file c3x-base.json
+
+      # Post diff comment
+      - run: c3x comment github --path c3x.json --compare-to c3x-base.json --github-token ${{ steps.c3x.outputs.token }} --repo ${{ github.repository }} --pull-request ${{ github.event.pull_request.number }} --show-all-projects
