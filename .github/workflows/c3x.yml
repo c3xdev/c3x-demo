@@ -1,0 +1,13 @@
+name: Cost Estimation
+on: [pull_request]
+permissions:
+  pull-requests: write
+jobs:
+  c3x:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: c3xdev/setup-c3x@v1
+        id: c3x
+      - run: c3x estimate --path . --format json --out-file c3x.json
+      - run: c3x comment github --path . --github-token ${{ steps.c3x.outputs.token }}
