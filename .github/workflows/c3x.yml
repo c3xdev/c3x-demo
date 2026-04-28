@@ -7,18 +7,7 @@ jobs:
   c3x:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - uses: c3xdev/setup-c3x@v1
-        id: c3x
-
-      # Estimate base branch
-      - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.base.ref }}
-      - run: c3x estimate --path . --format json --out-file /tmp/c3x-base.json
-
-      # Estimate PR branch and diff
-      - uses: actions/checkout@v4
-      - run: c3x diff --path . --compare-to /tmp/c3x-base.json --format json --out-file /tmp/c3x.json
-
-      # Post comment
-      - run: c3x comment github --path /tmp/c3x.json --github-token ${{ steps.c3x.outputs.token }} --repo ${{ github.repository }} --pull-request ${{ github.event.pull_request.number }} --show-all-projects
+          path: .
