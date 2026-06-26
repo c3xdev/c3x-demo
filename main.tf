@@ -10,7 +10,7 @@ resource "aws_instance" "web" {
 
 resource "aws_db_instance" "main" {
   engine         = "postgres"
-  instance_class = "db.r5.large"
+  instance_class = "db.r6g.xlarge"
   multi_az       = true
   allocated_storage = 100
 }
