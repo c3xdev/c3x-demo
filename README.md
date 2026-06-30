@@ -27,7 +27,25 @@ jobs:
           branded-comments: true
 ```
 
-See [PR #4](https://github.com/c3xdev/c3x-demo/pull/4) for a live example.
+On a pull request the comment shows the **cost delta versus the base
+branch** — e.g. `Total: $533.16/mo → $1038.32/mo  🔺 +$505.16` — with a
+per-resource breakdown. See [PR #4](https://github.com/c3xdev/c3x-demo/pull/4)
+for a live example.
+
+## Gate on cost increases
+
+Add `budget-delta` to fail the check when a PR raises the monthly cost
+by more than a set amount versus the base branch (independent of the
+absolute `budget` cap):
+
+```yaml
+      - uses: c3xdev/c3x@v0
+        with:
+          path: .
+          branded-comments: true
+          budget-delta: "50"     # fail if this PR adds > $50/mo
+          # budget: "1000"       # (optional) fail if the total exceeds $1000/mo
+```
 
 ## Links
 
