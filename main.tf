@@ -1,6 +1,6 @@
 resource "aws_instance" "web" {
   ami           = "ami-0c55b159cbfafe1f0"
-  instance_type = "m5.2xlarge"
+  instance_type = "m5.4xlarge"
 
   root_block_device {
     volume_size = 50
@@ -12,5 +12,5 @@ resource "aws_db_instance" "main" {
   engine         = "postgres"
   instance_class = "db.r5.xlarge"
   multi_az       = true
-  allocated_storage = 100
+  allocated_storage = 250
 }
