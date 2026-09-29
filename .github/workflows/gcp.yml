@@ -1,0 +1,24 @@
+name: "cost: gcp"
+
+on:
+  pull_request:
+    paths:
+      - "gcp/**"
+      - ".github/workflows/gcp.yml"
+
+permissions:
+  contents: read
+  pull-requests: write # post the cost comment
+  id-token: write      # comment as c3x-cloud[bot] (C3X Cloud app installed)
+
+jobs:
+  estimate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: c3xdev/c3x@v0
+        env:
+          C3X_COMMENT_TAG: gcp # one comment per scenario on the same PR
+        with:
+          path: gcp

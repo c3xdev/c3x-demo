@@ -1,0 +1,5 @@
+# Project config for c3x, picked up automatically by `c3x estimate`.
+usage_path = "c3x-usage.yml"
+
+# Fail the run when the monthly total goes above this amount.
+budget = 5000

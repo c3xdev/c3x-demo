@@ -1,0 +1,22 @@
+# Runtime usage for the resources whose cost depends on traffic rather
+# than on their configuration. Without it these lines price at $0 and
+# c3x flags them with a "usage_not_provided" caveat.
+version: 0.1
+
+resource_usage:
+  aws_s3_bucket.assets:
+    standard_storage_gb: 2000          # 2 TB of product images
+    monthly_tier_1_requests: 500000    # uploads (PUT/POST/LIST)
+    monthly_tier_2_requests: 20000000  # image reads (GET)
+
+  aws_lambda_function.thumbnailer:
+    monthly_requests: 3000000          # one invocation per uploaded image size
+    request_duration_ms: 400
+
+  aws_lb.web:
+    monthly_lcu_hours: 1460            # ~2 LCUs around the clock
+
+defaults:
+  # Applied to every NAT gateway (one per AZ).
+  aws_nat_gateway:
+    monthly_data_processed_gb: 500
