@@ -1,0 +1,7 @@
+version: 0.1
+
+resource_usage:
+  aws_s3_bucket.ReportsBucket:
+    standard_storage_gb: 500
+    monthly_tier_1_requests: 100000
+    monthly_tier_2_requests: 1000000

@@ -1,54 +1,112 @@
-# C3X Demo
+<div align="center">
 
-Example Terraform project demonstrating C3X cost estimation on pull requests.
+<img src="https://c3x.dev/android-chrome-512x512.png" width="76" alt="c3x">
 
-## How it works
+# c3x demo
 
-Every pull request automatically gets a cost estimate comment from [C3X Cloud](https://github.com/apps/c3x-cloud).
+**See what a pull request costs before you merge it.**
 
-The workflow (`.github/workflows/c3x.yml`) runs on every pull request:
+Live examples of [c3x](https://github.com/c3xdev/c3x), the open source cost
+estimator for Terraform, OpenTofu, Terragrunt and CloudFormation, running on
+real pull requests.
+
+[![GitHub Marketplace](https://img.shields.io/badge/marketplace-C3X%20Cost%20Estimation-00ADD8?logo=github)](https://github.com/marketplace/actions/c3x-cost-estimation)
+[![c3x release](https://img.shields.io/github/v/release/c3xdev/c3x?label=c3x&color=00ADD8)](https://github.com/c3xdev/c3x/releases)
+
+[Documentation](https://c3x.dev/docs) · [CI/CD guide](https://c3x.dev/docs/ci-cd) ·
+[c3x on GitHub](https://github.com/c3xdev/c3x) · [C3X Cloud app](https://github.com/apps/c3x-cloud)
+
+</div>
+
+<!-- LIVE-EXAMPLES -->
+
+## Add c3x to your repo in 60 seconds
+
+Create `.github/workflows/c3x.yml`:
 
 ```yaml
-name: Cost Estimation
+name: Cost estimate
 on: [pull_request]
 
 permissions:
-  pull-requests: write
-  id-token: write        # mints the branded c3x-cloud[bot] token
+  contents: read
+  pull-requests: write # post the comment
+  id-token: write      # optional: comment as c3x-cloud[bot]
 
 jobs:
   c3x:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: c3xdev/c3x@v0
         with:
-          path: .
-          branded-comments: true
+          path: .           # Terraform/OpenTofu directory, plan JSON or CloudFormation template
 ```
 
-On a pull request the comment shows the **cost delta versus the base
-branch** — e.g. `Total: $533.16/mo → $1038.32/mo  🔺 +$505.16` — with a
-per-resource breakdown. See [PR #4](https://github.com/c3xdev/c3x-demo/pull/4)
-for a live example.
+That's it: no API key, no account, no cloud credentials. On every pull
+request c3x estimates the base branch and the PR branch and posts the
+difference. `@v0` follows every c3x release.
 
-## Gate on cost increases
+Comments are posted as `github-actions` by default. Install the
+[C3X Cloud app](https://github.com/apps/c3x-cloud) on the repository (and keep
+`id-token: write`) to have them posted as **c3x-cloud[bot]**, as they are here.
 
-Add `budget-delta` to fail the check when a PR raises the monthly cost
-by more than a set amount versus the base branch (independent of the
-absolute `budget` cap):
+Useful inputs:
 
-```yaml
-      - uses: c3xdev/c3x@v0
-        with:
-          path: .
-          branded-comments: true
-          budget-delta: "50"     # fail if this PR adds > $50/mo
-          # budget: "1000"       # (optional) fail if the total exceeds $1000/mo
+| Input | What it does |
+|---|---|
+| `budget-delta: "500"` | Fail the check when the PR adds more than $500/mo |
+| `budget: "5000"` | Fail the check when the monthly total goes above $5,000 |
+| `strict: true` | Fail when any number rests on an assumption (⚠ caveat) |
+| `currency: EUR` | Show costs in another currency |
+
+Several directories on one PR? Give each run its own comment with
+`C3X_COMMENT_TAG` (see the [workflows in this repo](.github/workflows)).
+
+## Scenarios
+
+One directory per scenario, each with its own workflow that runs only when
+that directory changes. Totals are c3x's estimates at public on-demand list
+prices, in USD unless noted.
+
+| Directory | What's in it | What it shows | Monthly estimate |
+|---|---|---|---:|
+| [`aws/`](aws) | VPC over 3 AZs, NAT gateway per AZ, ALB, EC2 tiers, RDS PostgreSQL Multi-AZ, S3, Lambda | module `for_each`, `count` from `data.aws_availability_zones`, `dynamic` blocks, usage file, `.c3x.toml` budget, `budget-delta` gate | $1,115.58 |
+| [`azure/`](azure) | AKS (Standard tier), Azure SQL `GP_Gen5_4`, GRS storage, Linux VM | location inherited from the resource group and priced in `westeurope` | $1,451.13 |
+| [`gcp/`](gcp) | Cloud Run with warm instances, Cloud SQL HA, GKE, Compute Engine | zone → region pricing (`europe-west1-b`), Cloud Run minimum instances, ⚠ caveats | $1,341.10 ⚠ |
+| [`opentofu/`](opentofu) | EC2 + ElastiCache in two regions, `.tofu` files | OpenTofu provider `for_each`, per-region prices, `currency: EUR` | $597.59 (€526.27) |
+| [`cloudformation/`](cloudformation) | EC2, RDS PostgreSQL, S3 | CloudFormation templates, `strict: true` | $362.79 |
+
+⚠ The GCP estimate carries three caveats on purpose: c3x has no European
+Cloud SQL price yet, so it quotes the `us-central1` rate and flags those
+lines instead of hiding the gap. See [gcp/](gcp).
+
+## Run it locally
+
+```bash
+brew install c3xdev/tap/c3x        # or: curl -fsSL https://c3x.dev/install.sh | sh
+git clone https://github.com/c3xdev/c3x-demo && cd c3x-demo
+
+c3x estimate --path aws                             # per-resource breakdown
+c3x estimate --path azure --format json | jq .project_total
+c3x estimate --path cloudformation/template.yaml
 ```
+
+c3x reads the code statically: no `terraform init`, no providers, no
+credentials. Prices come from [pricing.c3x.dev](https://pricing.c3x.dev).
+
+## How much to trust the numbers
+
+c3x prices at public on-demand list rates, before reserved instances,
+savings plans, committed-use or negotiated discounts, so treat the totals
+as an upper bound. Anything that depends on traffic (S3 requests, Lambda
+invocations, NAT data, load balancer LCUs) comes from a
+[usage file](aws/c3x-usage.yml); without one those lines are $0 and marked
+⚠. More in the [docs](https://c3x.dev/docs).
 
 ## Links
 
-- [C3X](https://github.com/c3xdev/c3x)
-- [Documentation](https://c3x.dev/docs)
-- [CI/CD guide](https://c3x.dev/docs/ci-cd)
+- [c3x](https://github.com/c3xdev/c3x): source, releases, issue tracker
+- [Documentation](https://c3x.dev/docs) and [CI/CD guide](https://c3x.dev/docs/ci-cd) (GitHub, GitLab, Bitbucket, Azure DevOps, Atlantis)
+- [C3X Cost Estimation on the GitHub Marketplace](https://github.com/marketplace/actions/c3x-cost-estimation)
+- [C3X Cloud GitHub App](https://github.com/apps/c3x-cloud)

@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Internal reporting service - EC2 app server, PostgreSQL on RDS and a report bucket.
+
+Parameters:
+  AppInstanceType:
+    Type: String
+    Default: m7i.xlarge
+  DbInstanceClass:
+    Type: String
+    Default: db.r7g.large
+
+Resources:
+  AppServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-0fc5d935ebf8bc3bc
+      InstanceType: !Ref AppInstanceType
+
+  ReportsDb:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      Engine: postgres
+      EngineVersion: "16.4"
+      DBInstanceClass: !Ref DbInstanceClass
+      AllocatedStorage: 250
+      StorageType: gp3
+      MultiAZ: false
+      MasterUsername: reports
+      ManageMasterUserPassword: true
+
+  ReportsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: acme-reports-archive

@@ -1,0 +1,8 @@
+version: 0.1
+
+resource_usage:
+  # Traffic on top of the two always-warm instances.
+  google_cloud_run_v2_service.api:
+    monthly_requests: 50000000        # 50M requests
+    monthly_vcpu_seconds: 5000000     # active CPU time while serving
+    monthly_memory_gib_seconds: 10000000
