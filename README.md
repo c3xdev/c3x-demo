@@ -18,7 +18,25 @@ real pull requests.
 
 </div>
 
-<!-- LIVE-EXAMPLES -->
+<p align="center">
+  <a href="https://github.com/c3xdev/c3x-demo/pull/11">
+    <img src="docs/pr-comment.png" width="640"
+         alt="c3x-cloud bot comment on a pull request: monthly cost increased by $370.34 (+33.2%), from $1115.58/mo to $1485.92/mo, with a per-resource breakdown of the added and resized EC2 instances">
+  </a>
+</p>
+
+## Live examples
+
+Open pull requests in this repo, left open on purpose. Each one changes a
+scenario and gets a cost comment from **c3x-cloud[bot]**.
+
+| Pull request | Scenario | Cost change | What it shows |
+|---|---|---:|---|
+| [#11 Scale the web tier for launch](https://github.com/c3xdev/c3x-demo/pull/11) | aws | +$370.34/mo | An increase that passes the $500/mo `budget-delta` gate; added vs resized instances |
+| [#12 Rightsize the database](https://github.com/c3xdev/c3x-demo/pull/12) | azure | −$368.18/mo | A cost decrease, priced in the resource group's region (`westeurope`) |
+| [#13 Add a GPU training cluster](https://github.com/c3xdev/c3x-demo/pull/13) | aws | +$2,781.48/mo | ❌ The check **fails** on `budget-delta`, after the comment is posted |
+| [#14 Scale Cloud Run and GKE for the holiday peak](https://github.com/c3xdev/c3x-demo/pull/14) | gcp | +$390.80/mo | Cloud Run minimum instances, GKE node pool, ⚠ caveats listed in the comment |
+| [#15 Expand the edge API to Singapore](https://github.com/c3xdev/c3x-demo/pull/15) | opentofu | +$345.71/mo | OpenTofu provider `for_each`: a new region priced at its own rates |
 
 ## Add c3x to your repo in 60 seconds
 
@@ -58,6 +76,11 @@ Useful inputs:
 | `budget-delta: "500"` | Fail the check when the PR adds more than $500/mo |
 | `budget: "5000"` | Fail the check when the monthly total goes above $5,000 |
 | `strict: true` | Fail when any number rests on an assumption (⚠ caveat) |
+
+The gates run before the comment step, so a failing gate in the same step
+skips the comment. The [aws workflow](.github/workflows/aws.yml) posts the
+comment in one step and enforces `budget-delta` in a second, so reviewers
+always see the numbers.
 
 Several directories on one PR? Give each run its own comment with
 `C3X_COMMENT_TAG` (see the [workflows in this repo](.github/workflows)).
