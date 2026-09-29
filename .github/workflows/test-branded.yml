@@ -1,0 +1,25 @@
+name: Test branded auto
+on: [pull_request]
+jobs:
+  with-oidc:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: c3xdev/c3x@feat/branded-comments
+        with:
+          path: .
+  without-oidc:
+    needs: with-oidc
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: c3xdev/c3x@feat/branded-comments
+        with:
+          path: .
