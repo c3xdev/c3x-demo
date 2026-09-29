@@ -35,5 +35,10 @@ variable "tiers" {
       instance_count = 2
       data_volumes   = [100, 200]
     }
+    training = {
+      instance_type  = "g5.2xlarge"
+      instance_count = 3
+      data_volumes   = [500] # dataset cache
+    }
   }
 }
