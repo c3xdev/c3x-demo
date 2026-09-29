@@ -22,4 +22,3 @@ jobs:
           C3X_COMMENT_TAG: opentofu # one comment per scenario on the same PR
         with:
           path: opentofu
-          currency: EUR

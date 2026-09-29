@@ -58,7 +58,6 @@ Useful inputs:
 | `budget-delta: "500"` | Fail the check when the PR adds more than $500/mo |
 | `budget: "5000"` | Fail the check when the monthly total goes above $5,000 |
 | `strict: true` | Fail when any number rests on an assumption (⚠ caveat) |
-| `currency: EUR` | Show costs in another currency |
 
 Several directories on one PR? Give each run its own comment with
 `C3X_COMMENT_TAG` (see the [workflows in this repo](.github/workflows)).
@@ -74,7 +73,7 @@ prices, in USD unless noted.
 | [`aws/`](aws) | VPC over 3 AZs, NAT gateway per AZ, ALB, EC2 tiers, RDS PostgreSQL Multi-AZ, S3, Lambda | module `for_each`, `count` from `data.aws_availability_zones`, `dynamic` blocks, usage file, `.c3x.toml` budget, `budget-delta` gate | $1,115.58 |
 | [`azure/`](azure) | AKS (Standard tier), Azure SQL `GP_Gen5_4`, GRS storage, Linux VM | location inherited from the resource group and priced in `westeurope` | $1,451.13 |
 | [`gcp/`](gcp) | Cloud Run with warm instances, Cloud SQL HA, GKE, Compute Engine | zone → region pricing (`europe-west1-b`), Cloud Run minimum instances, ⚠ caveats | $1,341.10 ⚠ |
-| [`opentofu/`](opentofu) | EC2 + ElastiCache in two regions, `.tofu` files | OpenTofu provider `for_each`, per-region prices, `currency: EUR` | $597.59 (€526.27) |
+| [`opentofu/`](opentofu) | EC2 + ElastiCache in two regions, `.tofu` files | OpenTofu provider `for_each`, per-region prices | $597.59 |
 | [`cloudformation/`](cloudformation) | EC2, RDS PostgreSQL, S3 | CloudFormation templates, `strict: true` | $362.79 |
 
 ⚠ The GCP estimate carries three caveats on purpose: c3x has no European
@@ -90,6 +89,7 @@ git clone https://github.com/c3xdev/c3x-demo && cd c3x-demo
 c3x estimate --path aws                             # per-resource breakdown
 c3x estimate --path azure --format json | jq .project_total
 c3x estimate --path cloudformation/template.yaml
+c3x estimate --path opentofu --currency EUR       # €526.27/mo
 ```
 
 c3x reads the code statically: no `terraform init`, no providers, no

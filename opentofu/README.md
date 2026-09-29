@@ -18,5 +18,4 @@ $ c3x estimate --path opentofu
   PROJECT TOTAL: $597.59/mo
 ```
 
-The [workflow](../.github/workflows/opentofu.yml) posts this one in euros
-(`currency: EUR`).
+Add `--currency EUR` to see the same estimate in euros (€526.27/mo).
