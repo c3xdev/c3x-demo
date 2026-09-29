@@ -17,17 +17,11 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # The comment is always posted first; then the check fails if this
+      # PR adds more than $500/mo.
       - uses: c3xdev/c3x@v0
         env:
           C3X_COMMENT_TAG: aws # one comment per scenario on the same PR
         with:
           path: aws
-
-      # Gate: fail the check when this PR adds more than $500/mo.
-      # Runs as its own step, after the comment above is posted, so
-      # reviewers always see the numbers even when the gate fails.
-      - uses: c3xdev/c3x@v0
-        with:
-          path: aws
-          comment: false
           budget-delta: "500"

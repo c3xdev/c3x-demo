@@ -77,10 +77,9 @@ Useful inputs:
 | `budget: "5000"` | Fail the check when the monthly total goes above $5,000 |
 | `strict: true` | Fail when any number rests on an assumption (⚠ caveat) |
 
-The gates run before the comment step, so a failing gate in the same step
-skips the comment. The [aws workflow](.github/workflows/aws.yml) posts the
-comment in one step and enforces `budget-delta` in a second, so reviewers
-always see the numbers.
+The comment is always posted first; a gate that is exceeded then fails the
+check, as on [#13](https://github.com/c3xdev/c3x-demo/pull/13). Add
+`currency: EUR` (or any ISO code) to show the comment in another currency.
 
 Several directories on one PR? Give each run its own comment with
 `C3X_COMMENT_TAG` (see the [workflows in this repo](.github/workflows)).
@@ -93,15 +92,20 @@ prices, in USD unless noted.
 
 | Directory | What's in it | What it shows | Monthly estimate |
 |---|---|---|---:|
-| [`aws/`](aws) | VPC over 3 AZs, NAT gateway per AZ, ALB, EC2 tiers, RDS PostgreSQL Multi-AZ, S3, Lambda | module `for_each`, `count` from `data.aws_availability_zones`, `dynamic` blocks, usage file, `.c3x.toml` budget, `budget-delta` gate | $1,115.58 |
+| [`aws/`](aws) | VPC over 3 AZs, NAT gateway per AZ, ALB, EC2 tiers, RDS PostgreSQL Multi-AZ, S3, Lambda | module `for_each`, `count` from `data.aws_availability_zones`, `dynamic` blocks, usage file, `.c3x.toml` budget, `budget-delta` gate | $1,115.58 ⚠ |
 | [`azure/`](azure) | AKS (Standard tier), Azure SQL `GP_Gen5_4`, GRS storage, Linux VM | location inherited from the resource group and priced in `westeurope` | $1,451.13 |
 | [`gcp/`](gcp) | Cloud Run with warm instances, Cloud SQL HA, GKE, Compute Engine | zone → region pricing (`europe-west1-b`), Cloud Run minimum instances, ⚠ caveats | $1,341.10 ⚠ |
 | [`opentofu/`](opentofu) | EC2 + ElastiCache in two regions, `.tofu` files | OpenTofu provider `for_each`, per-region prices | $597.59 |
 | [`cloudformation/`](cloudformation) | EC2, RDS PostgreSQL, S3 | CloudFormation templates, `strict: true` | $362.79 |
 
-⚠ The GCP estimate carries three caveats on purpose: c3x has no European
-Cloud SQL price yet, so it quotes the `us-central1` rate and flags those
-lines instead of hiding the gap. See [gcp/](gcp).
+⚠ marks estimates where c3x says what it had to assume, on the line itself
+and in the PR comment, rather than presenting a guess as fact:
+
+- **aws**: the NAT gateways (one per availability zone) assume three zones,
+  because `data.aws_availability_zones` needs AWS credentials to read. A
+  plan JSON has the real list. See [aws/](aws).
+- **gcp**: c3x has no European Cloud SQL price yet, so it quotes the
+  `us-central1` rate and flags those lines. See [gcp/](gcp).
 
 ## Run it locally
 
@@ -111,7 +115,7 @@ git clone https://github.com/c3xdev/c3x-demo && cd c3x-demo
 
 c3x estimate --path aws                             # per-resource breakdown
 c3x estimate --path azure --format json | jq .project_total
-c3x estimate --path cloudformation/template.yaml
+c3x estimate --path cloudformation
 c3x estimate --path opentofu --currency EUR       # €526.27/mo
 ```
 
