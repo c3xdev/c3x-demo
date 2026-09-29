@@ -1,0 +1,25 @@
+name: Test setup-c3x wrapper
+on: [pull_request]
+permissions:
+  pull-requests: write
+  contents: read
+jobs:
+  estimate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: c3xdev/setup-c3x@wrap-c3x-action
+        with:
+          path: .
+          budget-delta: "10000"
+  install-only:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: c3xdev/setup-c3x@wrap-c3x-action
+        id: c3x
+        with:
+          version: "0.3.11"
+      - run: |
+          c3x --version
+          c3x --version | grep -q 0.3.11
+          test -n "${{ steps.c3x.outputs.token }}" && echo "token output present"
