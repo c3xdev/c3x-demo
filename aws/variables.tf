@@ -26,8 +26,8 @@ variable "tiers" {
   }))
   default = {
     web = {
-      instance_type  = "m7i.large"
-      instance_count = 3
+      instance_type  = "m7i.xlarge"
+      instance_count = 4
       data_volumes   = []
     }
     worker = {
