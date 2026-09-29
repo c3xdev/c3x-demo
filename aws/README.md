@@ -22,5 +22,6 @@ PROJECT TOTAL: $1115.58/mo
 ```
 
 `data.aws_availability_zones` can't be read without AWS credentials, so c3x
-assumes three zones for the region (`us-east-1a`, `-b`, `-c`) and prints a
-warning saying so. For exact counts, price a plan JSON instead.
+assumes three zones for the region (`us-east-1a`, `-b`, `-c`) and marks each
+NAT gateway and Elastic IP with an `assumed_count` ⚠ caveat naming that
+assumption. For exact counts, price a plan JSON instead.

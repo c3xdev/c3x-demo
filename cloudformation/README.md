@@ -6,7 +6,7 @@ requests come from [`c3x-usage.yml`](c3x-usage.yml). Parameter defaults
 (`!Ref AppInstanceType`) are resolved.
 
 ```console
-$ c3x estimate --path cloudformation/template.yaml
+$ c3x estimate --path cloudformation
 ...
 PROJECT TOTAL: $362.79/mo
 ```
