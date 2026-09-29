@@ -11,12 +11,8 @@
 $ c3x estimate --path gcp
 ...
 PROJECT TOTAL: $1341.1/mo
-
-⚠ 3 caveats (marked above): parts of this total rest on assumptions,
-  so it may misstate the real cost. --strict fails the run when this happens.
 ```
 
-This scenario shows **caveats**. c3x has no European Cloud SQL price in
-its catalog yet, so it quotes the `us-central1` rate for the three Cloud SQL
-lines and marks each with ⚠ instead of hiding the gap. Run with `--strict`
-(or `strict: true` in the Action) to fail on any such assumption.
+Everything is priced in `europe-west1`, including Cloud SQL, whose price
+lookups use the region's own SKUs ("… in Belgium"), and the Compute Engine
+VM and GKE nodes, whose region comes from the zone.

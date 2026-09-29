@@ -21,7 +21,7 @@ real pull requests.
 <p align="center">
   <a href="https://github.com/c3xdev/c3x-demo/pull/11">
     <img src="docs/pr-comment.png" width="640"
-         alt="c3x-cloud bot comment on a pull request: monthly cost increased by $370.34 (+33.2%), from $1115.58/mo to $1485.92/mo, with a per-resource breakdown of the added and resized EC2 instances">
+         alt="c3x-cloud bot comment on a pull request: monthly cost increased by $370.34 (+33.2%), from $1115.58/mo to $1485.92/mo, with a per-resource breakdown of the added and resized EC2 instances and a caveat note for the assumed NAT gateway count">
   </a>
 </p>
 
@@ -35,7 +35,7 @@ scenario and gets a cost comment from **c3x-cloud[bot]**.
 | [#11 Scale the web tier for launch](https://github.com/c3xdev/c3x-demo/pull/11) | aws | +$370.34/mo | An increase that passes the $500/mo `budget-delta` gate; added vs resized instances |
 | [#12 Rightsize the database](https://github.com/c3xdev/c3x-demo/pull/12) | azure | −$368.18/mo | A cost decrease, priced in the resource group's region (`westeurope`) |
 | [#13 Add a GPU training cluster](https://github.com/c3xdev/c3x-demo/pull/13) | aws | +$2,781.48/mo | ❌ The check **fails** on `budget-delta`, after the comment is posted |
-| [#14 Scale Cloud Run and GKE for the holiday peak](https://github.com/c3xdev/c3x-demo/pull/14) | gcp | +$390.80/mo | Cloud Run minimum instances, GKE node pool, ⚠ caveats listed in the comment |
+| [#14 Scale Cloud Run and GKE for the holiday peak](https://github.com/c3xdev/c3x-demo/pull/14) | gcp | +$390.80/mo | Cloud Run minimum instances and a GKE node pool, priced in `europe-west1` |
 | [#15 Expand the edge API to Singapore](https://github.com/c3xdev/c3x-demo/pull/15) | opentofu | +$345.71/mo | OpenTofu provider `for_each`: a new region priced at its own rates |
 
 ## Add c3x to your repo in 60 seconds
@@ -94,18 +94,15 @@ prices, in USD unless noted.
 |---|---|---|---:|
 | [`aws/`](aws) | VPC over 3 AZs, NAT gateway per AZ, ALB, EC2 tiers, RDS PostgreSQL Multi-AZ, S3, Lambda | module `for_each`, `count` from `data.aws_availability_zones`, `dynamic` blocks, usage file, `.c3x.toml` budget, `budget-delta` gate | $1,115.58 ⚠ |
 | [`azure/`](azure) | AKS (Standard tier), Azure SQL `GP_Gen5_4`, GRS storage, Linux VM | location inherited from the resource group and priced in `westeurope` | $1,451.13 |
-| [`gcp/`](gcp) | Cloud Run with warm instances, Cloud SQL HA, GKE, Compute Engine | zone → region pricing (`europe-west1-b`), Cloud Run minimum instances, ⚠ caveats | $1,341.10 ⚠ |
+| [`gcp/`](gcp) | Cloud Run with warm instances, Cloud SQL HA, GKE, Compute Engine | zone → region pricing (`europe-west1-b`), Cloud Run minimum instances, regional Cloud SQL | $1,341.10 |
 | [`opentofu/`](opentofu) | EC2 + ElastiCache in two regions, `.tofu` files | OpenTofu provider `for_each`, per-region prices | $597.59 |
 | [`cloudformation/`](cloudformation) | EC2, RDS PostgreSQL, S3 | CloudFormation templates, `strict: true` | $362.79 |
 
 ⚠ marks estimates where c3x says what it had to assume, on the line itself
-and in the PR comment, rather than presenting a guess as fact:
-
-- **aws**: the NAT gateways (one per availability zone) assume three zones,
-  because `data.aws_availability_zones` needs AWS credentials to read. A
-  plan JSON has the real list. See [aws/](aws).
-- **gcp**: c3x has no European Cloud SQL price yet, so it quotes the
-  `us-central1` rate and flags those lines. See [gcp/](gcp).
+and in the PR comment, rather than presenting a guess as fact. In **aws**,
+the NAT gateways (one per availability zone) assume three zones, because
+`data.aws_availability_zones` needs AWS credentials to read; a plan JSON has
+the real list. See [aws/](aws).
 
 ## Run it locally
 
