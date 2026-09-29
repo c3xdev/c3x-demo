@@ -54,7 +54,7 @@ resource "azurerm_mssql_server" "main" {
 resource "azurerm_mssql_database" "orders" {
   name      = "orders"
   server_id = azurerm_mssql_server.main.id
-  sku_name  = "GP_Gen5_4" # General Purpose, 4 vCores
+  sku_name  = "GP_Gen5_2" # General Purpose, 2 vCores
 }
 
 # --- Storage ----------------------------------------------------------------
