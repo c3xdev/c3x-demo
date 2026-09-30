@@ -16,7 +16,7 @@ terraform {
 variable "regions" {
   description = "Regions the edge API is deployed to."
   type        = set(string)
-  default     = ["us-east-1", "eu-west-1"]
+  default     = ["us-east-1", "eu-west-1", "ap-southeast-1"]
 }
 
 provider "aws" {
