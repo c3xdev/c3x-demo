@@ -22,7 +22,7 @@ resource "google_cloud_run_v2_service" "api" {
 
   template {
     scaling {
-      min_instance_count = 2 # always-warm instances, billed around the clock
+      min_instance_count = 4 # always-warm instances, billed around the clock
       max_instance_count = 20
     }
 
@@ -68,7 +68,7 @@ resource "google_container_node_pool" "batch" {
   name       = "batch"
   cluster    = google_container_cluster.batch.id
   location   = "europe-west1-b"
-  node_count = 3
+  node_count = 5
 
   node_config {
     machine_type = "n2-standard-4"
